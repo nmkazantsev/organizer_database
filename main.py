@@ -14,10 +14,12 @@ class Part(Base):
     __tablename__ = "part"
     id: Mapped[int] = mapped_column(primary_key=True)
     type: Mapped[int] = mapped_column(Integer(), ForeignKey('type.id', ondelete='CASCADE'), )
-    in_project: Mapped[bool] = mapped_column(Boolean(), nullable=False)
+    proj: Mapped[int] = mapped_column(Integer(), ForeignKey('project.id', ondelete='CASCADE'), default=0)
+    in_project: Mapped[bool] = mapped_column(Boolean(), nullable=False, default=False)
     place: Mapped[str] = mapped_column(Text(), nullable=False)
     info: Mapped[str] = mapped_column(Text(), nullable=True)
     part_type = relationship("Type", back_populates="parts")
+    part_use = relationship("Project", back_populates="parts")
 
 
 class Type(Base):
@@ -27,13 +29,29 @@ class Type(Base):
     parts = relationship("Part", back_populates="part_type")
 
 
+class Project(Base):
+    __tablename__ = "project"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(Text(), nullable=False)
+    description: Mapped[str] = mapped_column(Text(), nullable=True)
+    link: Mapped[str] = mapped_column(Text(), nullable=False)
+    archived: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    parts = relationship("Part", back_populates="part_use")
+
+
 Base.metadata.create_all(engine)
 
-'''typ = Type(name="arduino")
-part = Part(in_project=False, place="here")
-typ.parts = [part]
-session.add(typ)
-session.add(part)'''
+arduino_type = Type(name="arduino")
+uno = Part(place="here")
+arduino_type.parts = [uno]
+session.add(arduino_type)
+session.add(uno)
+p = Project(name="test_p", link="ttt")
+p.parts = [uno]
+session.add(p)
 '''t = session.query(Part).all()
 print(t[0].part_type.name)'''
+for i in session.query(Project).all():
+    print(i.parts)
+    print(i.parts[0].part_type.name)
 session.commit()
