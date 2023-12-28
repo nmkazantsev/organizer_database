@@ -18,5 +18,6 @@ if len(session.query(Part).all()) == 0:
     p.parts = [uno]
     session.add(p)
 
-DbConnector.set_session(session)
+DbConnector.set_engine(engine)
 print(DbConnector.add_part("arduino", "second", "there"))
+print(DbConnector.add_type("esp"))
