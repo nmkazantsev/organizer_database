@@ -95,3 +95,15 @@ class DbConnector:
             parts.append({"part_id": str(i.id), "free": str(not i.in_project)})
         js["parts"] = parts
         return json.dumps(js)
+
+    @staticmethod
+    def get_part_info(id_: int):
+        try:
+            part = session.query(Part).filter(Part.id == id_).one()
+        except NoResultFound:
+            return json.dumps({"status": "error", "details": "part not found"})
+        js = {"status": "ok", "type": str(part.part_type.name), "free": str(not part.in_project), "place": part.place,
+              "info": part.info}
+        if not (part.part_use is None):
+            js["project"] = part.part_use.name
+        return json.dumps(js)
