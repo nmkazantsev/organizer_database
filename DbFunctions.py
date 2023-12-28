@@ -1,5 +1,5 @@
 import json
-
+from sqlalchemy import and_
 from Model import Part, Type, Project, session
 
 
@@ -41,3 +41,13 @@ class DbConnector:
         session.add(p)
         session.commit()
         return json.dumps({"status": "ok", "details": ""})
+
+    @staticmethod
+    def get_all_types():
+        q = session.query(Type).all()
+        l = list()
+        for numb, i in enumerate(q):
+            total = len(i.parts)
+            free = session.query(Part).filter(and_(Part.in_project == False, Part.part_type == i)).count()
+            l.append({"name": i.name, "parts_free": f"{free}/{total}"})
+        return json.dumps({"status": "ok", "types": l})
