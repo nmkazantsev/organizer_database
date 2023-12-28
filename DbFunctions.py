@@ -35,3 +35,10 @@ class DbConnector:
         DbConnector.session.add(t)
         DbConnector.session.commit()
         return json.dumps({"status": "ok", "details": ""})
+
+    @staticmethod
+    def add_proj(name: str, link: str, description: str = None):
+        p = Project(name=name, description=description, link=link)
+        DbConnector.session.add(p)
+        DbConnector.session.commit()
+        return json.dumps({"status": "ok", "details": ""})
