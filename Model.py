@@ -1,7 +1,10 @@
-from sqlalchemy import Integer, ForeignKey, Boolean, Text
-from sqlalchemy.orm import declarative_base, Mapped, mapped_column, relationship
+from sqlalchemy import Integer, ForeignKey, Boolean, Text, create_engine
+from sqlalchemy.orm import declarative_base, Mapped, mapped_column, relationship, Session
 
 Base = declarative_base()
+
+engine = create_engine("sqlite:///database.db", echo=False)
+session = Session(engine)
 
 
 class Part(Base):
@@ -33,5 +36,14 @@ class Project(Base):
     parts = relationship("Part", back_populates="part_use")
 
 
-def create_db(engine):
-    Base.metadata.create_all(engine)
+Base.metadata.create_all(engine)
+
+if len(session.query(Part).all()) == 0:
+    arduino_type = Type(name="arduino")
+    uno = Part(place="here")
+    arduino_type.parts = [uno]
+    session.add(arduino_type)
+    session.add(uno)
+    p = Project(name="test_p", link="ttt")
+    p.parts = [uno]
+    session.add(p)

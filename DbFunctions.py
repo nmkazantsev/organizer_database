@@ -1,8 +1,6 @@
 import json
 
-from sqlalchemy.orm import Session
-
-from Model import Part, Type, Project
+from Model import Part, Type, Project, session
 
 
 class DbConnector:
@@ -12,39 +10,34 @@ class DbConnector:
         pass
 
     @staticmethod
-    def set_engine(engine):
-        DbConnector.session = Session(engine)
-
-    @staticmethod
     def add_part(p_type: str, info: str, place: str):
         if place is None or len(place) == 0:
             return json.dumps({"status": "error", "details": "place not specified"})
         p = Part(type=p_type, info=info, place=place)
-        t = DbConnector.session.query(Type).filter(Type.name == p_type).all()
+        t = session.query(Type).filter(Type.name == p_type).all()
         if len(t) == 0:
             return json.dumps({"status": "error", "details": "type not found"})
         t = t[0]  # because only one can be
         t.parts.append(p)
-        print(t.parts)
-        DbConnector.session.commit()
+        session.commit()
         return json.dumps({"status": "ok", "details": ""})
 
     @staticmethod
     def add_type(name: str):
-        q = DbConnector.session.query(Type).filter(Type.name == name).all()
+        q = session.query(Type).filter(Type.name == name).all()
         if len(q) > 0:
             return json.dumps({"status": "error", "details": "type exists"})
         t = Type(name=name)
-        DbConnector.session.add(t)
-        DbConnector.session.commit()
+        session.add(t)
+        session.commit()
         return json.dumps({"status": "ok", "details": ""})
 
     @staticmethod
     def add_proj(name: str, link: str, description: str = None):
-        q = DbConnector.session.query(Project).filter(Project.name == name).all()
+        q = session.query(Project).filter(Project.name == name).all()
         if len(q) > 0:
             return json.dumps({"status": "error", "details": "project exists"})
         p = Project(name=name, description=description, link=link)
-        DbConnector.session.add(p)
-        DbConnector.session.commit()
+        session.add(p)
+        session.commit()
         return json.dumps({"status": "ok", "details": ""})
