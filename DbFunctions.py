@@ -1,5 +1,7 @@
 import json
 from sqlalchemy import and_
+from sqlalchemy.exc import NoResultFound
+
 from Model import Part, Type, Project, session
 
 
@@ -14,10 +16,10 @@ class DbConnector:
         if place is None or len(place) == 0:
             return json.dumps({"status": "error", "details": "place not specified"})
         p = Part(type=p_type, info=info, place=place)
-        t = session.query(Type).filter(Type.name == p_type).all()
-        if len(t) == 0:
+        try:
+            t = session.query(Type).filter(Type.name == p_type).one()
+        except NoResultFound:
             return json.dumps({"status": "error", "details": "type not found"})
-        t = t[0]  # because only one can be
         t.parts.append(p)
         session.commit()
         return json.dumps({"status": "ok", "details": ""})
@@ -45,9 +47,28 @@ class DbConnector:
     @staticmethod
     def get_all_types():
         q = session.query(Type).all()
-        l = list()
+        info = list()
         for numb, i in enumerate(q):
             total = len(i.parts)
             free = session.query(Part).filter(and_(Part.in_project == False, Part.part_type == i)).count()
-            l.append({"name": i.name, "parts_free": f"{free}/{total}"})
-        return json.dumps({"status": "ok", "types": l})
+            info.append({"name": i.name, "parts_free": f"{free}/{total}"})
+        return json.dumps({"status": "ok", "types": info})
+
+    @staticmethod
+    def add_to_project(id_: int, proj_name: str):
+        try:
+            project = session.query(Project).filter(Project.name == proj_name).one()
+        except NoResultFound:
+            return json.dumps({"status": "error", "details": "project not found"})
+        try:
+            detail = session.query(Part).filter(Part.id == id_).one()
+        except NoResultFound:
+            return json.dumps({"status": "error", "details": "part not found"})
+        if detail.in_project:
+            return json.dumps({"status": "error", "details": "part already used"})
+        if project.archived:
+            return json.dumps({"status": "error", "details": "project archived"})
+        project.parts.append(detail)
+        detail.in_project = True
+        session.commit()
+        return json.dumps({"status": "ok", "details": ""})
