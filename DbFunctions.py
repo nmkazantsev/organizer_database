@@ -72,3 +72,11 @@ class DbConnector:
         detail.in_project = True
         session.commit()
         return json.dumps({"status": "ok", "details": ""})
+
+    @staticmethod
+    def get_all_projects():
+        projects = session.query(Project).all()
+        info = list()
+        for numb, i in enumerate(projects):
+            info.append({"name": i.name, "archive": f"{i.archived}"})
+        return json.dumps({"status": "ok", "projects": info})
