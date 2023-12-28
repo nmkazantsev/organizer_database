@@ -19,6 +19,6 @@ if len(session.query(Part).all()) == 0:
     session.add(p)
 
 DbConnector.set_engine(engine)
-'''print(DbConnector.add_part("arduino", "second", "there"))
-print(DbConnector.add_type("esp"))'''
+print(DbConnector.add_part("esp", "second", "there"))
+print(DbConnector.add_type("esp"))
 print(DbConnector.add_proj(name="second", link="http"))

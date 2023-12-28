@@ -31,6 +31,9 @@ class DbConnector:
 
     @staticmethod
     def add_type(name: str):
+        q = DbConnector.session.query(Type).filter(Type.name == name).all()
+        if len(q) > 0:
+            return json.dumps({"status": "error", "details": "type exists"})
         t = Type(name=name)
         DbConnector.session.add(t)
         DbConnector.session.commit()
@@ -38,6 +41,9 @@ class DbConnector:
 
     @staticmethod
     def add_proj(name: str, link: str, description: str = None):
+        q = DbConnector.session.query(Project).filter(Project.name == name).all()
+        if len(q) > 0:
+            return json.dumps({"status": "error", "details": "project exists"})
         p = Project(name=name, description=description, link=link)
         DbConnector.session.add(p)
         DbConnector.session.commit()
