@@ -80,3 +80,18 @@ class DbConnector:
         for numb, i in enumerate(projects):
             info.append({"name": i.name, "archive": f"{i.archived}"})
         return json.dumps({"status": "ok", "projects": info})
+
+    @staticmethod
+    def get_type_info(name: str):
+        try:
+            my_type = session.query(Type).filter(Type.name == name).one()
+        except NoResultFound:
+            return json.dumps({"status": "error", "details": "type not found"})
+        total = len(my_type.parts)
+        free = session.query(Part).filter(and_(Part.in_project == False, Part.part_type == my_type)).count()
+        js = {"status": "ok", "name": name, "parts_free": f"{total}/{free}"}
+        parts = []
+        for i in my_type.parts:
+            parts.append({"part_id": str(i.id), "free": str(not i.in_project)})
+        js["parts"] = parts
+        return json.dumps(js)
