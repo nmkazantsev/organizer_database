@@ -12,7 +12,7 @@ class DbConnector:
         pass
 
     @staticmethod
-    def add_part(p_type: str, info: str, place: str):
+    def add_part(p_type: str, info: str, place: str, amount: int):
         if place is None or len(place) == 0:
             return json.dumps({"status": "error", "details": "place not specified"})
         p = Part(type=p_type, info=info, place=place)
@@ -20,7 +20,8 @@ class DbConnector:
             t = session.query(Type).filter(Type.name == p_type).one()
         except NoResultFound:
             return json.dumps({"status": "error", "details": "type not found"})
-        t.parts.append(p)
+        for i in range(amount):
+            t.parts.append(p)
         session.commit()
         return json.dumps({"status": "ok", "details": ""})
 
@@ -107,3 +108,16 @@ class DbConnector:
         if not (part.part_use is None):
             js["project"] = part.part_use.name
         return json.dumps(js)
+
+    @staticmethod
+    def update_part(id_: int, info: str = None, place: str = None):
+        try:
+            part = session.query(Part).filter(Part.id == id_).one()
+        except NoResultFound:
+            return json.dumps({"status": "error", "details": "part not found"})
+        if info is not None:
+            part.info = info
+        if place is not None:
+            part.place = place
+        session.commit()
+        return json.dumps({"status": "ok", "details": ""})
