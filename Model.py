@@ -11,7 +11,7 @@ class Part(Base):
     __tablename__ = "part"
     id: Mapped[int] = mapped_column(primary_key=True)
     type: Mapped[int] = mapped_column(Integer(), ForeignKey('type.id', ondelete='CASCADE'), )
-    proj: Mapped[int] = mapped_column(Integer(), ForeignKey('project.id', ondelete='CASCADE'), default=0)
+    proj: Mapped[int] = mapped_column(Integer(), ForeignKey('project.id'), default=0)
     in_project: Mapped[bool] = mapped_column(Boolean(), nullable=False, default=False)
     place: Mapped[str] = mapped_column(Text(), nullable=False)
     info: Mapped[str] = mapped_column(Text(), nullable=True)

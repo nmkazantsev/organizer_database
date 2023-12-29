@@ -37,7 +37,8 @@ class DbConnector:
 
     @staticmethod
     def add_proj(name: str, link: str, description: str = None):
-        if session.query(Type).filter(Type.name == name).count() != 0:
+        print(session.query(Project).filter(Project.name == name).all())
+        if len(session.query(Project).filter(Project.name == name).all()) != 0:
             return json.dumps({"status": "error", "details": "project name bisy"})
         q = session.query(Project).filter(Project.name == name).all()
         if len(q) > 0:
@@ -162,3 +163,32 @@ class DbConnector:
         js = {"status": "ok", "id": proj.id, "name": proj.name, "link": proj.link, "archived": proj.archived,
               "description": proj.description}
         return json.dumps(js)
+
+    @staticmethod
+    def delete_type(name: str):
+        try:
+            my_type = session.query(Type).filter(Type.name == name).one()
+        except NoResultFound:
+            return json.dumps({"status": "error", "details": "type not found"})
+        details = ""
+        for i in my_type.parts:
+            details += DbConnector.delete_part(i.id)
+        session.query(Type).filter(Type.name == name).delete()
+        session.commit()
+        return json.dumps({"status": "ok", "details": details})
+
+    @staticmethod
+    def delete_part(id_: int):
+        try:
+            part = session.query(Part).filter(Part.id == id_).one()
+        except NoResultFound:
+            return json.dumps({"status": "error", "details": "part not found"})
+        error = ""
+        if part.in_project:
+            proj = part.part_use
+            proj.archived = True
+            error = f"project {proj.name} was archived"
+        session.query(Part).filter(Part.id == id_).delete()
+        if error == "":
+            return json.dumps({"status": "ok", "details": ""})
+        return json.dumps({"status": "warning", "details": error})
