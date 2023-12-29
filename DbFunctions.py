@@ -37,6 +37,8 @@ class DbConnector:
 
     @staticmethod
     def add_proj(name: str, link: str, description: str = None):
+        if session.query(Type).filter(Type.name == name).count() != 0:
+            return json.dumps({"status": "error", "details": "project name bisy"})
         q = session.query(Project).filter(Project.name == name).all()
         if len(q) > 0:
             return json.dumps({"status": "error", "details": "project exists"})
@@ -121,3 +123,42 @@ class DbConnector:
             part.place = place
         session.commit()
         return json.dumps({"status": "ok", "details": ""})
+
+    @staticmethod
+    def update_type(name: str, new_name: str):
+        if session.query(Type).filter(Type.name == name).count() != 0:
+            return json.dumps({"status": "error", "details": "project name bisy"})
+        try:
+            my_type = session.query(Type).filter(Type.name == name).one()
+        except NoResultFound:
+            return json.dumps({"status": "error", "details": "type not found"})
+        my_type.name = new_name
+        session.commit()
+        return json.dumps({"status": "ok", "details": ""})
+
+    @staticmethod
+    def update_project(id_: int, name: str = None, description: str = None, link: str = None, archive: bool = None):
+        try:
+            proj = session.query(Project).filter(Project.id == id_).one()
+        except NoResultFound:
+            return json.dumps({"status": "error", "details": "project not found"})
+        if name is not None:
+            proj.info = name
+        if description is not None:
+            proj.description = description
+        if link is not None:
+            proj.description = description
+        if archive is not None:
+            proj.archived = archive
+        session.commit()
+        return json.dumps({"status": "ok", "details": ""})
+
+    @staticmethod
+    def get_project_details(name: str):
+        try:
+            proj = session.query(Project).filter(Project.name == name).one()
+        except NoResultFound:
+            return json.dumps({"status": "error", "details": "project not found"})
+        js = {"status": "ok", "id": proj.id, "name": proj.name, "link": proj.link, "archived": proj.archived,
+              "description": proj.description}
+        return json.dumps(js)
