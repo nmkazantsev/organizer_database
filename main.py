@@ -2,7 +2,8 @@ from DbFunctions import DbConnector
 
 print(DbConnector.create_device(name="arduino", total=3, place="here"))
 print(DbConnector.create_device(name="esp", total=3, place="here"))
-print(DbConnector.delete_device(1))
+print(DbConnector.delete_device(2))
+print(DbConnector.edit_device(3, name="esp8266"))
 '''print(DbConnector.add_part("esp", "new", "there", 1))
 print(DbConnector.add_type("arduino"))
 print(DbConnector.add_part("arduino", "new", "there2", 1))

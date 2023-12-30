@@ -40,3 +40,23 @@ class DbConnector:
         session.query(Device).filter(Device.id == id_).delete()
         session.commit()
         return ok()
+
+    @staticmethod
+    def edit_device(id_: int, name: str = None, place: str = None, info: str = None, total: int = None,
+                    used: int = None):
+        try:
+            d = session.query(Device).filter(Device.id == id_).one()
+        except NoResultFound:
+            return error("device does not exists")
+        if name is not None:
+            d.name = name
+        if place is not None:
+            d.place = place
+        if info is not None:
+            d.info = info
+        if total is not None:
+            d.total = total
+        if used is not None:
+            d.used = used
+        session.commit()
+        return ok()
