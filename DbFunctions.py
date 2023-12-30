@@ -1,7 +1,7 @@
 import json
 from sqlalchemy import and_
 from sqlalchemy.exc import NoResultFound, IntegrityError
-from Model import Device, session
+from Model import Device, session, Project
 
 
 def ok(details=None):
@@ -58,5 +58,26 @@ class DbConnector:
             d.total = total
         if used is not None:
             d.used = used
+        session.commit()
+        return ok()
+
+    @staticmethod
+    def create_project(name: str, description: str = None, link: str = None):
+        try:
+            d = Project(name=name, description=description, link=link)
+            session.add(d)
+            session.commit()
+        except IntegrityError:
+            session.rollback()
+            return error("project exists")
+        return ok()
+
+    @staticmethod
+    def delete_project(id_: int):
+        try:
+            p = session.query(Project).filter(Project.id == id_).one()
+        except NoResultFound:
+            return error("project does not exists")
+        session.query(Project).filter(Project.id == id_).delete()
         session.commit()
         return ok()
