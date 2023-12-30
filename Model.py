@@ -40,4 +40,4 @@ if len(session.query(Device).all()) == 0:
     m.devices = [a]
     session.add(m)
     session.add(arduino)
-    print(session.query(Device).all()[0].projects[0].name)
+    print(session.query(Device).all()[0].projects[0].device.name)
