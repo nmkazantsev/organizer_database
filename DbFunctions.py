@@ -81,3 +81,25 @@ class DbConnector:
         session.query(Project).filter(Project.id == id_).delete()
         session.commit()
         return ok()
+
+    @staticmethod
+    def edit_project(id_: int, name: str = None, description: str = None, archived: bool = None, link: str = None):
+        try:
+            p = session.query(Project).filter(Project.id == id_).one()
+        except NoResultFound:
+            return error("project does not exists")
+        if name is not None:
+            p.name = name
+        if link is not None:
+            p.link = link
+        if description is not None:
+            p.description = description
+        if archived is not None:
+            p.archived = archived
+            for assoc in p.devices:
+                if archived:
+                    assoc.device.used -= assoc.amount
+                else:
+                    assoc.device.used -= assoc.amount
+        session.commit()
+        return ok()
