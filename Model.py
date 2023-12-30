@@ -38,14 +38,3 @@ class Device(Base):
 
 
 Base.metadata.create_all(engine)
-'''
-arduino = Device(name="arduino", place="here")
-m = Project(name="new")
-a = Association(amount=2)
-a.device = arduino
-m.devices = [a]
-session.add(m)
-session.add(arduino)
-print(session.query(Device).all()[0].projects[0].device.name)
-arduino.projects.remove(m)
-session.commit()'''
