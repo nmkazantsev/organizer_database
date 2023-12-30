@@ -2,7 +2,7 @@ import json
 from sqlalchemy import and_
 from sqlalchemy.exc import NoResultFound
 
-from Model import Part, Type, Project, session
+from Model import Device, session
 
 
 class DbConnector:

@@ -1,6 +1,6 @@
 from DbFunctions import DbConnector
 
-print(DbConnector.add_part("esp", "new", "there", 1))
+'''print(DbConnector.add_part("esp", "new", "there", 1))
 print(DbConnector.add_type("arduino"))
 print(DbConnector.add_part("arduino", "new", "there2", 1))
 print(DbConnector.add_proj(name="second", link="http"))
@@ -17,3 +17,4 @@ print(DbConnector.update_type("esp", "esp8266"))
 print(DbConnector.update_project(1, description="updated project"))
 print(DbConnector.get_project_details("test_p"))
 print(DbConnector.delete_type("arduino"))
+'''
