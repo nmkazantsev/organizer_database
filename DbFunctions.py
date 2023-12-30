@@ -25,6 +25,18 @@ class DbConnector:
             session.add(d)
             session.commit()
         except IntegrityError:
+            session.rollback()
             return error("device exists")
+        return ok()
+
+    @staticmethod
+    def delete_device(id_: int):
+        try:
+            d = session.query(Device).filter(Device.id == id_).one()
+        except NoResultFound:
+            return error("device does not exists")
+        if len(d.projects) != 0:
+            return error("device used in project")
+        session.query(Device).filter(Device.id == id_).delete()
         session.commit()
         return ok()
