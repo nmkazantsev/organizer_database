@@ -34,18 +34,18 @@ class Device(Base):
     place = Column(Text(), nullable=False)
     total = Column(Integer(), default=0)
     used = Column(Integer(), default=0)
-    info  = Column(Text())
+    info = Column(Text())
 
 
 Base.metadata.create_all(engine)
-
-'''if len(session.query(Device).all()) == 0:
-    arduino = Device(name="arduino")
-    m = Project(name="new")
-    a = Association(amount=2)
-    a.device = arduino
-    m.devices = [a]
-    session.add(m)
-    session.add(arduino)
-    print(session.query(Device).all()[0].projects[0].device.name)
-    session.commit()'''
+'''
+arduino = Device(name="arduino", place="here")
+m = Project(name="new")
+a = Association(amount=2)
+a.device = arduino
+m.devices = [a]
+session.add(m)
+session.add(arduino)
+print(session.query(Device).all()[0].projects[0].device.name)
+arduino.projects.remove(m)
+session.commit()'''
