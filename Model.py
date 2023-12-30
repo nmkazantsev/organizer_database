@@ -20,14 +20,20 @@ class Project(Base):
     __tablename__ = "project_table"
     id = Column(Integer, primary_key=True)
     devices = relationship("Association", back_populates="project")
-    name = Column(Text())
+    name = Column(Text(), unique=True, nullable=False)
+    description = Column(Text())
+    link = Column(Text())
+    archived = Column(Boolean(), default=False)
 
 
 class Device(Base):
     __tablename__ = "device_table"
     id = Column(Integer, primary_key=True)
     projects = relationship("Association", back_populates="device")
-    name = Column(Text())
+    name = Column(Text(), unique=True, nullable=False)
+    place = Column(Text(), nullable=False)
+    total = Column(Integer(), default=0)
+    used = Column(Integer(), default=0)
 
 
 Base.metadata.create_all(engine)
@@ -41,3 +47,4 @@ if len(session.query(Device).all()) == 0:
     session.add(m)
     session.add(arduino)
     print(session.query(Device).all()[0].projects[0].device.name)
+    session.commit()
